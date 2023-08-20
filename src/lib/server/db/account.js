@@ -1,5 +1,4 @@
 import Database from 'better-sqlite3';
-import { v4 as uuidv4 } from 'uuid';
 import { DB_PATH } from '$env/static/private';
 
 const db = new Database(DB_PATH, { verbose: console.log });

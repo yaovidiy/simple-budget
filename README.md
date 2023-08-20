@@ -6,6 +6,7 @@ An app for simple integration with MONO API and manual adding the receipts
 - Sync accounts with MONO bank accounts
 - Manually add receipts
 - Manually add accounts
+- Bind receipt to account
 
 ## Next version improvements
 - Adding receipts photos via phone camera and save it localy
