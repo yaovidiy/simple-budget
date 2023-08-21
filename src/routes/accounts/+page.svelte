@@ -2,9 +2,39 @@
   export let data;
 
   let reciepts = [];
+  let selectedAccount = null;
+
+  async function saveReceipts() {
+    try {
+      const modifiedReceipts = reciepts.map(reciept => {
+        reciept['account'] = selectedAccount;
+
+        return reciept;
+      });
+      const resp = await fetch('/api/save-reciepts', {
+        method: 'POST',
+        body: JSON.stringify(modifiedReceipts)
+      });
+
+      if (!resp.ok) {
+        console.log(resp.status);
+        alert('Error on saving!');
+        return;
+      }
+
+      const res = await resp.json();
+
+      console.log(res);
+      alert('All receipts have been saved');
+    } catch(err) {
+      console.log(err);
+      alert('Error on saving');
+    }
+  }
   
   async function getReciepts(id) {
     try {
+      selectedAccount = id;
       const resp = await fetch(`/api/get-account/`, {
         method: 'post',
         body: JSON.stringify({account: id})
@@ -53,6 +83,7 @@
 {/if}
 
 {#if reciepts.length}
+<button on:click={saveReceipts}>Save receipts</button>
   <table>
     <tr>
       <th>Time</th>

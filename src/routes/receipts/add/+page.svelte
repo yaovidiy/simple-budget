@@ -26,6 +26,12 @@
     <option value="980" selected>UAH</option>
     <option value="840" selected>USD</option>
   </select>
+  <select name="account" id="account">
+    <option value="">Select account</option>
+    {#each data?.accounts as account}
+      <option value={account.id}>{account.name} - {account.currency}</option>
+    {/each}
+  </select>
   <textarea name="description" id="description" cols="30" rows="10" placeholder="Опис">{form?.description || ''}</textarea>
   <input type="submit" value="Додати" />
 </form>

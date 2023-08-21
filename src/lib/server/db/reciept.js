@@ -51,7 +51,7 @@ export function getOne(rowid) {
 
 export function getGeneralAll() {
   try {
-    const sql = `select receipts.rowid as rowid, id, mccCategories.title as mccTitle, currencyCodes.short as currency, amount, description, time from receipts inner join mccCategories on mccCategories.code = receipts.mcc inner join currencyCodes on currencyCodes.code = receipts.currencyCode order by receipts.time desc`;
+    const sql = `select receipts.rowid as rowid, receipts.id, mccCategories.title as mccTitle, accounts.name as account, accounts.currencyCode as accountCurrency, currencyCodes.short as currency, amount, description, time from receipts inner join mccCategories on mccCategories.code = receipts.mcc inner join currencyCodes on currencyCodes.code = receipts.currencyCode inner join accounts on receipts.accountID = accounts.id order by receipts.time desc`;
   
     const prepare = db.prepare(sql);
     const rows = prepare.all();
@@ -82,12 +82,16 @@ export async function insertOne(receipt) {
   }
 }
 
-export async function getByDateAndCat(date = '', cat = '') {
+export async function getByDateAndCat(date = '', cat = '', account = '') {
 
   const sqlDateAndCat = `select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where time >= @startDate and time <= @endDate and mcc.title = @cat order by r.time desc`;
   const sqlDate = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where time >= @startDate and time <= @endDate order by r.time desc';
   const sqlCat = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where mcc.title = @cat order by r.time desc';
-  const sqlAll = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode order by r.time desc'
+  const sqlAll = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode order by r.time desc';
+  const sqlAccount = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where r.accountID = @account order by r.time desc'
+  const sqlDateAndCatAndAccount = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where time >= @startDate and time <= @endDate and mcc.title = @cat and r.accountID = @account order by r.time desc';
+  const sqlCatAndAccount = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where mcc.title = @cat and r.accountID = @account order by r.time desc';
+  const sqlDateAndAccount = 'select r.rowid as rowid, mcc.title as mccTitle, curr.short as currency, amount, description, time from receipts as r join mccCategories as mcc on mcc.code = r.mcc join currencyCodes as curr on curr.code = r.currencyCode where time >= @startDate and time <= @endDate and r.accountID = @account order by r.time desc';
   const dateObj = new Date(date);
 
   const startDate = Math.floor(dateObj.getTime() / 1000);
@@ -95,17 +99,25 @@ export async function getByDateAndCat(date = '', cat = '') {
   const endDate = Math.floor(dateObj.getTime() / 1000);
   try {
     let sql = sqlDateAndCat;
-    
-    if (date && !cat) {
+
+    if (date && !cat && !account) {
       sql = sqlDate;
-    } else if (!date && cat) {
-      sql = sqlCat
-    } else if (!date && !cat) {
+    } else if (!date && cat && !account) {
+      sql = sqlCat;
+    } else if (!date && !cat && account) {
+      sql = sqlAccount;
+    } else if (!date && cat && account) {
+      sql = sqlCatAndAccount;
+    } else if (date && cat && account) {
+      sql = sqlDateAndCatAndAccount;
+    } else if (date && !cat && account) {
+      sql = sqlDateAndAccount;
+    } else if (!date && !cat && !account) {
       sql = sqlAll;
     }
 
     const prepare = db.prepare(sql);
-    const rows = prepare.all({startDate, endDate, cat});
+    const rows = prepare.all({startDate, endDate, cat, account});
 
     return {error: false, rows: rows};
   } catch(err) {
@@ -114,9 +126,9 @@ export async function getByDateAndCat(date = '', cat = '') {
   }
 }
 
-export async function insertMany(receipts) {
+export async function insertManyReceipts(receipts) {
   try {
-    const sql = 'insert or ignore into receipts(id, mcc, currencyCode, amount, operationAmount, description, cashbackAmount, commissionRate, time) values(@id, @mcc, @currencyCode, @amount, @operationAmount, @description, @cashbackAmount, @commissionRate, @time)';
+    const sql = 'insert or ignore into receipts(id, mcc, currencyCode, amount, operationAmount, description, cashbackAmount, commissionRate, time, accountID) values(@id, @mcc, @currencyCode, @amount, @operationAmount, @description, @cashbackAmount, @commissionRate, @time, @account)';
     const insert = db.prepare(sql);
     
     const insertMany = db.transaction((receipts) => {

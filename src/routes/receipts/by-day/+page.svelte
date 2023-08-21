@@ -57,6 +57,12 @@
       <option value={category.title}>{category.title}</option>
     {/each}
   </select>
+  <select value={form?.account || ''} name="account" id="account">
+    <option value="">All</option>
+    {#each data?.accounts as account}
+      <option value={account.id}>{account.name} - {account.currency}</option>
+    {/each}
+  </select>
   <input type="submit" value="selete date">
 </form>
 <table>
@@ -66,6 +72,7 @@
     <th>Currency</th>
     <th>Amount</th>
     <th>Description</th>
+    <th>Account</th>
     <th>Action</th>
   </tr>
   {#if !data?.error}
@@ -76,6 +83,7 @@
         <td>{row.currency}</td>
         <td>{row.amount / 100}</td>
         <td>{row.description}</td>
+        <td></td>
         <td>
           <a href={`/receipts/edit/${row.rowid}`}>edit</a>
           <form action="?/delete" method="post">
