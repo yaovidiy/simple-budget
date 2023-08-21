@@ -1,11 +1,13 @@
 import { getOne, updateOne } from '$lib/server/db/reciept.js';
 import { getMCC } from "$lib/server/db/MCC.js";
+import { getAccounts } from '$lib/server/db/account.js';
 
 export async function load({params}) {
   const item = await getOne(params.slug);
   const categories = await getMCC();
-  
-  return {item, categories};
+  const accounts = await getAccounts();
+
+  return {item, categories, accounts};
 }
 
 function transformToSeconds(time) {

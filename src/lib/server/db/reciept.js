@@ -21,7 +21,7 @@ export function deleteOne(rowid) {
 }
 
 export function updateOne(data) {
-  const sql = 'update receipts set amount = @amount, currencyCode = @currencyCode, mcc = @mcc, description = @description, time = @time where rowid = @rowid';
+  const sql = 'update receipts set amount = @amount, currencyCode = @currencyCode, mcc = @mcc, description = @description, time = @time, accountID = @account where rowid = @rowid';
   try {
     const prepare = db.prepare(sql);
     const result = prepare.run(data);
@@ -36,7 +36,7 @@ export function updateOne(data) {
 }
 
 export function getOne(rowid) {
-  const sql = 'select rowid, currencyCode, mcc, currencyCode, amount, description, time from receipts where rowid = @rowid';
+  const sql = 'select rowid, currencyCode, mcc, currencyCode, amount, description, time, accountID from receipts where rowid = @rowid';
 
   try {
     const prepare = db.prepare(sql);
@@ -71,7 +71,7 @@ export async function insertOne(receipt) {
   data.amount = data.amount * 100;
 
   try {
-    const sql = 'insert into receipts(id, mcc, currencyCode, amount, description, time) values(@id, @mcc, @currencyCode, @amount, @description, @time)';
+    const sql = 'insert into receipts(id, mcc, currencyCode, amount, description, time, accountID) values(@id, @mcc, @currencyCode, @amount, @description, @time, @account)';
     const prepare = db.prepare(sql);
     const res = prepare.run(data);
 

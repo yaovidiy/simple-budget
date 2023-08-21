@@ -32,6 +32,12 @@
         <option value={cat.code}>{cat.title} - {cat.code}</option>
       {/each}
     </select>
+    <select name="account" value={data?.item?.item?.accountID} id="account">
+      <option value="">None</option>
+      {#each data?.accounts as account}
+        <option value={account.id}>{account.name} - {account.currency}</option>
+      {/each}
+    </select>
     <textarea name="description" id="description" cols="30" rows="10">{data?.item?.item?.description}</textarea>
     <input type="date" name="time" id="time" value={transfomDate(data?.item?.item?.time)}>
     <input type="submit" value="Update!">
