@@ -8,6 +8,13 @@ An app for simple integration with MONO API and manual adding the receipts
 - Manually add accounts
 - Bind receipt to account
 
-## Next version improvements
+## Next version 0.2 improvements
 - Adding receipts photos via phone camera and save it localy
 - Impove UI/UX
+- Add navigation
+
+## Full verions feature list
+- Dark UI mode
+- User login
+- Better charts visualizations
+- Save files localy
